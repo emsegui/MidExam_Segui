@@ -6,49 +6,18 @@
       name: kibana
       state: latest
     when: ansible_distribution == "Ubuntu"
-  
-  - name: Remove hashtag in serverport on Ubuntu
-    lineinfile:
-      dest: /etc/kibana/kibana.yml
-      regexp: '#server.port'
-      line: 'server.port: 5601'
-    when: ansible_distribution == "Ubuntu"
 
-  - name: Remove hashtag on server.host
-    lineinfile: 
-      dest: /etc/kibana/kibana.yml
-      regexp: '#server.host'
-      line: 'server.hosts "0.0.0.0"'
-    when: ansible_distribution == "Ubuntu"
-
-  - name: Remove hashtag on elasticsearch.hosts
-    lineinfile: 
-      dest: /etc/kibana/kibana.yml
-      regexp: '#elasticsearch.hosts:'
-      line: 'elasticsearch.hosts: ["http://0.0.0.0:9200"]'
+  - name: Reload Daemon for Kibana on Ubuntu
+    systemd: daemon_reload=yes
     when: ansible_distribution == "Ubuntu"
 
   - name: Enable Kibana on Ubuntu
-    service:
+    systemd:
       name: kibana
-      state: started
       enabled: yes
     when: ansible_distribution == "Ubuntu"
 
-  - name: All UFW Service on Ubuntu
-    command: ufw allow 5601/tcp
-
 # Install Kibana on CentOS
-
-  - name: Install Kibana Repository 
-    yum_repository:
-      name: Kibana 7.x packages
-      baseurl: https://artifacts.elastic.co/packages/7.x/yum
-      gpgcheck: yes
-      gpgkey: https://artifacts.elastic.com/GPG-KEY-elasticsearch
-      enabled: yes
-      description: Kibana-7.x
-    when: ansible_distribution == "CentOS"
 
   - name: Install Kibana on CentOS
     yum:
@@ -57,16 +26,8 @@
       update_cache: yes
     when: ansible_distribution == "CentOS"
 
-  - name: Update server.host config on CentOS
-    lineinfile: 
-      destfile: /etc/kibana/kibana.yml
-      regexp: 'serverhost'
-      line: 'server.host: 0.0.0.0'
-    when: ansible_distribution == "CentOS"
-
-  - name: Update config file server.port CentOS
-    lineinfile:
-      dest: /etc/kibana/kibana.yml
+  - name: Reload Daemon for Kibana on CentOS
+    systemd: daemon_reload=yes
     when: ansible_distribution == "CentOS"
 
   - name: Enable Kibana on CentOS

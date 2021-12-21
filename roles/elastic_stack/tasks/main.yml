@@ -3,7 +3,7 @@
 
 # install java and nginx
 
-  - include: config_prerqs.yml
+  - include: config_prerqs.yaml
 
 # install Elasticsearch
   
