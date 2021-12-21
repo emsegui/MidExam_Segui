@@ -1,2 +1,51 @@
 ---
-# tasks file for influxdb
+# tasks file for influxdb on Centos
+- name: Creating  influxdb.repo File on CentOS
+  file:
+    path: "/etc/yum.repos.d/influxdb.repo"
+    state: touch
+  when: ansible_distribution == "CentOS"
+
+- name: Add Influxdb Repository on CentOS
+  copy:
+    dest: /etc/yum.repos.d/influxdb.repo
+    content: |
+      [influxdb]
+      name = influxDB Repository - RHEL
+      baseurl = https://repos.influxdata.com/rhel/7/x86_64/stable/
+      enabled = 1
+      gpgcheck = 1
+      gpgkey = https://repos.influxdata.com/influxdb.key
+  when: ansible_distribution == "CentOS"
+  
+- name: Installation Influxdb on CentOS
+  yum:
+    name: influxdb
+    state: latest
+    update_cache: yes
+  when: ansible_distribution == "CentOS"
+
+- name: Starting Influxdb Services on CentOS
+  service:
+    name: influxdb
+    state: started
+  when: ansible_distribution == "CentOS"
+
+# on Ubuntu 
+- name: Add Influxdata Key on Ubuntu
+  apt_key:
+    url: https://repos.influxdata.com/influxdb.key
+    state: present
+  when: ansible_distribution == "Ubuntu"
+
+- name: Install Influxdb on Ubuntu
+  apt:
+    name: influxdb
+    state: latest
+    update_cache: yes
+  when: ansible_distribution == "Ubuntu"
+
+- name: Start influxdb on Ubuntu
+  service:
+    name: influxdb
+  when: ansible_distribution == "Ubuntu"

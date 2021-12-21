@@ -1,41 +1,68 @@
-=---
-# tasks file for grafana
-  - name: Add repo for Grafana
-    copy:
-      src: grafana.repo
-      dest: /etc/yum.repos.d/
-    when: ansible_distribution == "CentOS"
+---
+- name: Install Grafana Packages on Ubuntu
+  apt:
+    name: apt-transport-https
+    state: present
+    update_cache: yes
+  when: ansible_distribution == "Ubuntu"
 
-  - name: Install Grafana
-    yum: 
-      name: grafana
-      state: latest
-      update_cache: yes
-    when: ansible_distribution == "CentOS"
+- name: Add Grafana GPG Key on Ubuntu
+  apt_key:
+    url: "https://packages.grafana.com/gpg.key"
+    state: present
+  when: ansible_distribution == "Ubuntu"
 
-  - name: start and enable grafana
-    service:
-      name: grafana-server
-      state: started
-      enabled: yes
-    when: ansible_distribution == "CentOS"
+- name: Add Grafana Repository on Ubuntu
+  apt_repository:
+    repo: deb https://packages.grafana.com/oss/deb stable main
+    state: present
+    filename: grafana
+  when: ansible_distribution == "Ubuntu"
 
-  - name: Add repo for Grafana
-    copy:
-      src: grafana.repo
-      dest: /etc/yum.repos.d/
-    when: ansible_distribution == "Ubuntu"
+- name: Install Grafana on Ubuntu
+  apt:
+    name: grafana
+    state: latest
+    update_cache: yes
+  when: ansible_distribution == "Ubuntu"
 
-  - name: Install Grafana
-    apt:
-      name: grafana
-      state: latest
-      update_cache: yes
-    when: ansible_distribution == "Ubuntu"
+- name: Start Grafana on Ubuntu
+  service:
+    name: grafana-server
+    state: started
+    enabled: yes
+  when: ansible_distribution == "Ubuntu"
 
-  - name: start and enable grafana
-    service:
-      name: grafana-server
-      state: started
-      enabled: yes
-    when: ansible_distribution == "Ubuntu"
+# CentOS
+- name: Creating Grana Repository on CentOS
+  file:
+    path: "/etc/yum.repos.d/grafana.repo"
+    state: touch
+  when: ansible_distribution == "CentOS"
+
+- name: Adding Grafana Repository
+  copy:
+    dest: /etc/yum.repos.d/grafana.repo
+    content: |
+      name=grafana
+      baseurl=https://packages.grafana.com/oss/rpm
+      repo_gpgcheck=1
+      enabled=1
+      gpgcheck=1
+      gpgkey=https://packages.grafana.com/gpg.key
+      sslverify=1
+      sslcacert=/etc/pki/tls/certs/ca-bundle.crt
+  when: ansible_distribution == "CentOS"
+
+- name: Install Grafana on CentOS
+  yum:
+    name: grafana
+    state: latest
+    update_cache: yes
+  when: ansible_distribution == "CentOS"
+
+- name: Start Grafana on CentOS
+  service:
+    name: grafana-server
+    state: started
+  when: ansible_distribution == "CentOS"

@@ -1,6 +1,6 @@
 ---
 # tasks file for nagios
-  - include: nagios_cdp.yml
+  - include: nagios_main.yml
   - include: nagios_plugins.yml 
-
+  - include: nagios_setup.yml
 

@@ -3,11 +3,11 @@
     hosts: all
     become: True
     roles:
-     - elastic_stack
-     - grafana
+    # - elastic_stack
+    # - grafana
      - prometheus 
      - influxdb
-     - lamp_stack
+    # - lamp_stack
 
   - name: Install Nagios on Ubuntu 
     hosts: Ubuntu

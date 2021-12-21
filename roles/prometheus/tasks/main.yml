@@ -1,2 +1,49 @@
 ---
 # tasks file for prometheus
+- name: Install Prometheus on Ubuntu
+  apt:
+    name: prometheus
+    state: latest
+    update_cache: yes
+  when: ansible_distribution == "Ubuntu"
+
+- name: Start Prometheus on Ubuntu
+  service:
+    name: prometheus
+    state: started
+  when: ansible_distribution == "Ubuntu"
+
+# CentOS
+- name: Creating prometheus.repo File
+  file:
+    path: "/etc/yum.repos.d/prometheus.repo"
+    state: touch
+  when: ansible_distribution == "CentOS"
+
+- name: Adding Prometheus Repository
+  copy:
+    dest: /etc/yum.repos.d/prometheus.repo
+    content: |
+      [prometheus]
+      name=prometheus
+      baseurl=https://packagecloud.io/prometheus-rpm/release/el/$releasever/$basearch
+      repo_gpgcheck=1
+      enabled=1
+      gpgkey=https://packagecloud.io/prometheus-rpm/release/gpgkey
+             https://raw.githubusercontent.com/lest/prometheus-rpm/master/RPM-GPG-KEY-prometheus-rpm
+      gpgcheck=1
+      metadata_expire=300
+  when: ansible_distribution == "CentOS"
+
+- name: Installation of Prometheus
+  dnf:
+    name: prometheus2
+    state: latest
+    update_cache: yes
+  when: ansible_distribution == "CentOS"
+
+- name: Starting Prometheus Services
+  service: 
+    name: prometheus
+    state: started
+  when: ansible_distribution == "CentOS"
