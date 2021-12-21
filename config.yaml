@@ -5,8 +5,8 @@
     roles:
      - elastic_stack
      - grafana
-    # - prometheus 
-    # - influxdb
+     - prometheus 
+     - influxdb
      - lamp_stack
 
   - name: Install Nagios on Ubuntu 
