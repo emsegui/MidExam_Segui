@@ -1,0 +1,117 @@
+---
+# Install Elasticsearch on Ubuntu
+  - name: Add ELK APT Key on Ubuntu
+    apt_key:
+      url: "https://artifacts.elastic.co/GPG-KEY-elasticsearch"
+      state: present
+    when: ansible_distribution == "Ubuntu"
+
+  - name: Add ELK Repository on Ubuntu
+    apt_repository:
+      repo: "deb https://artifacts.elastic.co/packages/7.x/apt stable main"
+      state: present
+      filename: "elasticsearch.list"
+    when: ansible_distribution == "Ubuntu"
+
+  - name: Install Elasticsearch on Ubuntu
+    apt:
+      name: elasticsearch
+      state: latest
+      update_cache: yes
+    when: ansible_distribution == "Ubuntu"
+
+  - name: Allow Access on Ubuntu
+    lineinfile:
+      destfile: /etc/elasticsearch/elasticsearch.yml
+    when: ansible_distribution == "Ubuntu"
+
+  - name: Update Port Configuration on Ubuntu
+    lineinfile:
+      destfile: /etc/elasticsearch/elasticsearch.yml
+      regexp: 'http.port'
+      line: 'http.port: 9200'
+    when: ansible_distribution == "Ubuntu"
+
+  - name: Add discovery type on Ubuntu
+    lineinfile:
+      destfile: /etc/elasticsearch/elasticsearch.yml
+      line: 'discover.type: "single-node" '
+    when: ansible_distribution == "Ubuntu"
+
+  - name: Jvm Heap size on Ubuntu
+    lineinfile: 
+      dest: /etc/elasticsearch/jvm.options
+      regexp: '-Xms'
+      line: '-Xms512m'
+    when: ansible_distribution == "Ubuntu"
+
+  - name: Jvm Heap Max on Ubuntu
+    lineinfile: 
+      dest: /etc/elasticsearch/jvm.options
+      regexp: '-Xmx'
+      line: '-Xms512m'
+    when: ansible_distribution == "Ubuntu"
+
+  - name: Off UFW Service on Ubuntu
+    service:
+      name: ufw
+      state: stopped
+      enabled: no
+    when: ansible_distribution == "Ubuntu"
+
+  - name: Start and Enable Elasticsearch on Ubuntu
+    service: 
+      name: elasticsearch
+      state: started
+      enabled: yes
+# Install Elasticsearch on CentOS
+  - name: Add ELK RPM key on CentOS
+    rpm_key:
+      key: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+      state: present
+    when: ansible_distribution == "CentOS"
+
+  - name: Add ELK Repository on CentOS
+    yum_repository:
+      name: elasticsearch-7.x
+      description: Adds repository key
+      baseurl: https://artifacts.elastic.co/packages/7.x/yum
+      gpgcheck: True
+      gpgkey: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    when: ansible_distribution == "CentOS"
+
+  - name: Install Elasticsearch on CentOS
+    yum:
+      name: elasticsearch
+      state: latest
+      update_cache: yes
+    when: ansible_distribution  == "CentOS"
+
+  - name: Allow Access on CentOS
+    lineinfile: 
+      destfile: /etc/elasticsearch/elasticsearch.yml
+      regexp: '#network.host:'
+      line: 'network.host: localhost'
+    when: ansible_distribution  == "CentOS"
+
+  - name: Update Port to Allow Access on CentOS
+    lineinfile: 
+      destfile: /etc/elasticsearch/elasticsearch.yml
+      regexp: '#http.port:'
+      line: 'http.port: 9200'
+    when: ansible_distribution  == "CentOS"
+
+  - name: Update time on CentOS
+    lineinfile:
+      dest: /usr/lib/systemd/system/elasticsearch.service
+      regexp: 'TimeoutStartSec='
+      line: 'TimeoutStartSec=900'
+    when: ansible_distribution  == "CentOS"
+
+  - name: Enable and Start Elasticsearch on CentOS
+    service:
+      name: elasticsearch
+      state: started
+      enabled: yes
+    when: ansible_distribution  == "CentOS"
+
